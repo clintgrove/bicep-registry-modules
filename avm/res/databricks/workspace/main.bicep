@@ -204,14 +204,14 @@ resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = if (!empt
   }
 }
 
-resource cMKManagedDiskKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = if (!empty(customerManagedKeyManagedDisk.?keyVaultResourceId)) {
+resource cMKManagedDiskKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = if (!empty(customerManagedKeyManagedDisk.?keyVaultResourceId) && customerManagedKeyManagedDisk.?keyVaultResourceId != customerManagedKey.?keyVaultResourceId) {
   name: last(split((customerManagedKeyManagedDisk.?keyVaultResourceId ?? 'dummyVault'), '/'))
   scope: resourceGroup(
     split((customerManagedKeyManagedDisk.?keyVaultResourceId ?? '//'), '/')[2],
     split((customerManagedKeyManagedDisk.?keyVaultResourceId ?? '////'), '/')[4]
   )
 
-  resource cMKDiskKey 'keys@2023-02-01' existing = if (!empty(customerManagedKeyManagedDisk.?keyVaultResourceId) && !empty(customerManagedKeyManagedDisk.?keyName)) {
+  resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKeyManagedDisk.?keyVaultResourceId) && !empty(customerManagedKeyManagedDisk.?keyName)) {
     name: customerManagedKeyManagedDisk.?keyName ?? 'dummyKey'
   }
 }
@@ -342,7 +342,7 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
                     keyName: customerManagedKeyManagedDisk!.keyName
                     keyVersion: last(split(
                       (!empty(customerManagedKeyManagedDisk) && customerManagedKeyManagedDisk!.?keyVaultName != customerManagedKey!.?keyVaultName)
-                        ? cMKManagedDiskKeyVault::cMKDiskKey.properties.keyUriWithVersion
+                        ? cMKManagedDiskKeyVault::cMKKey.properties.keyUriWithVersion
                         : cMKKeyVault::cMKKey.properties.keyUriWithVersion,
                       '/'
                     ))
