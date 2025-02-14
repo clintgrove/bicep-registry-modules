@@ -21,7 +21,7 @@ param serviceShort string = 'dwmax'
 param baseTime string = utcNow('u')
 
 @description('Optional. A token to inject into the name of each resource.')
-param namePrefix string = 'm4br5' //'#_namePrefix_#'
+param namePrefix string = '#_namePrefix_#'
 
 @description('Required. The object id of the AzureDatabricks Enterprise Application. This value is tenant-specific and must be stored in the CI Key Vault in a secret named \'CI-AzureDatabricksEnterpriseApplicationObjectId\'.')
 @secure()

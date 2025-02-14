@@ -1,10 +1,10 @@
 param location string = 'eastus'
 param workspaceName string = 'db1kvworkspc'
-param keyVaultName string = 'dbx1KeyVgroove'
+param keyVaultName string = 'dbx1KeyVgroove2'
 param keyName string = 'databricksKey'
 param skuName string = 'premium' // Can be standard or premium
 param resourceGroupName string = 'dbx-onekeyvault'
-var managedResourceGroupName = 'dog'
+var managedResourceGroupName = 'dbx-onekeyvault-managed'
 var trimmedMRGName = substring(managedResourceGroupName, 0, min(length(managedResourceGroupName), 90))
 var managedResourceGroupId = '${subscription().id}/resourceGroups/${trimmedMRGName}'
 
@@ -49,14 +49,14 @@ resource databricksWorkspace 'Microsoft.Databricks/workspaces@2023-02-01' = {
           keySource: 'Microsoft.Keyvault'
           keyVaultProperties: {
             keyVaultUri: keyVault.properties.vaultUri
-            keyName: keyVault.name
+            keyName: keyVault::key.name
             keyVersion: last(split(keyVault::key.properties.keyUriWithVersion, '/')) // key.properties.keyUriWithVersion // Use the key version from the key resource
           }
         }
         managedServices: {
           keySource: 'Microsoft.Keyvault'
           keyVaultProperties: {
-            keyName: keyVault.name
+            keyName: keyVault::key.name
             keyVaultUri: keyVault.properties.vaultUri
             keyVersion: last(split(keyVault::key.properties.keyUriWithVersion, '/'))
           }
