@@ -199,12 +199,7 @@ resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = if (!empt
     split((customerManagedKey.?keyVaultResourceId ?? '////'), '/')[4]
   )
 
-  // Only create the key if it's NOT the same as Managed Disk Key Vault
-  resource cMKKey 'keys@2023-02-01' existing = if (
-    !empty(customerManagedKey.?keyVaultResourceId) &&
-    !empty(customerManagedKey.?keyName) &&
-    (customerManagedKey.?keyVaultResourceId != customerManagedKeyManagedDisk.?keyVaultResourceId)
-  ) {
+  resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKey.?keyVaultResourceId) && !empty(customerManagedKey.?keyName)) {
     name: customerManagedKey.?keyName ?? 'dummyKey'
   }
 }
@@ -216,12 +211,7 @@ resource cMKManagedDiskKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing 
     split((customerManagedKeyManagedDisk.?keyVaultResourceId ?? '////'), '/')[4]
   )
 
-  // If the Key Vault is the SAME as `customerManagedKey`, use its existing key instead of redefining
-  resource cMKKey 'keys@2023-02-01' existing = if (
-    !empty(customerManagedKeyManagedDisk.?keyVaultResourceId) &&
-    !empty(customerManagedKeyManagedDisk.?keyName) &&
-    (customerManagedKeyManagedDisk.?keyVaultResourceId != customerManagedKey.?keyVaultResourceId)
-  ) {
+  resource cMKDiskKey 'keys@2023-02-01' existing = if (!empty(customerManagedKeyManagedDisk.?keyVaultResourceId) && !empty(customerManagedKeyManagedDisk.?keyName)) {
     name: customerManagedKeyManagedDisk.?keyName ?? 'dummyKey'
   }
 }
@@ -352,7 +342,7 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
                     keyName: customerManagedKeyManagedDisk!.keyName
                     keyVersion: last(split(
                       (!empty(customerManagedKeyManagedDisk) && customerManagedKeyManagedDisk!.?keyVaultName != customerManagedKey!.?keyVaultName)
-                        ? cMKManagedDiskKeyVault::cMKKey.properties.keyUriWithVersion
+                        ? cMKManagedDiskKeyVault::cMKDiskKey.properties.keyUriWithVersion
                         : cMKKeyVault::cMKKey.properties.keyUriWithVersion,
                       '/'
                     ))
