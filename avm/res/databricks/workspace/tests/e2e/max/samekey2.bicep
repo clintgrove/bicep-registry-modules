@@ -1,9 +1,9 @@
 param location string = 'eastus'
-param workspaceName string = 'db1kvworkspc7'
-param keyVaultName string = 'dbx1KeyVgroove7'
-param keyVaultNameDisk string = 'dbx1KeyDISKVgroove7'
-param storageAccountNamevar string = 'doghgrdbx7'
-var managedResourceGroupName = 'dbx-onekeyvault-managed7'
+param workspaceName string = 'db1kvworkspc8'
+param keyVaultName string = 'dbx1KeyVgroove8'
+param keyVaultNameDisk string = 'dbx1KeyDISKVgroove8'
+param storageAccountNamevar string = 'doghgrdbx8'
+var managedResourceGroupName = 'dbx-onekeyvault-managed8'
 var trimmedMRGName = substring(managedResourceGroupName, 0, min(length(managedResourceGroupName), 90))
 var managedResourceGroupId = '${subscription().id}/resourceGroups/${trimmedMRGName}'
 
