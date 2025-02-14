@@ -199,7 +199,12 @@ resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = if (!empt
     split((customerManagedKey.?keyVaultResourceId ?? '////'), '/')[4]
   )
 
-  resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKey.?keyVaultResourceId) && !empty(customerManagedKey.?keyName)) {
+  // Only create the key if it's NOT the same as Managed Disk Key Vault
+  resource cMKKey 'keys@2023-02-01' existing = if (
+    !empty(customerManagedKey.?keyVaultResourceId) &&
+    !empty(customerManagedKey.?keyName) &&
+    (customerManagedKey.?keyVaultResourceId != customerManagedKeyManagedDisk.?keyVaultResourceId)
+  ) {
     name: customerManagedKey.?keyName ?? 'dummyKey'
   }
 }
@@ -211,7 +216,12 @@ resource cMKManagedDiskKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing 
     split((customerManagedKeyManagedDisk.?keyVaultResourceId ?? '////'), '/')[4]
   )
 
-  resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKeyManagedDisk.?keyVaultResourceId) && !empty(customerManagedKeyManagedDisk.?keyName)) {
+  // If the Key Vault is the SAME as `customerManagedKey`, use its existing key instead of redefining
+  resource cMKKey 'keys@2023-02-01' existing = if (
+    !empty(customerManagedKeyManagedDisk.?keyVaultResourceId) &&
+    !empty(customerManagedKeyManagedDisk.?keyName) &&
+    (customerManagedKeyManagedDisk.?keyVaultResourceId != customerManagedKey.?keyVaultResourceId)
+  ) {
     name: customerManagedKeyManagedDisk.?keyName ?? 'dummyKey'
   }
 }
@@ -336,11 +346,16 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
               ? {
                   keySource: 'Microsoft.Keyvault'
                   keyVaultProperties: {
-                    keyVaultUri: cMKManagedDiskKeyVault.properties.vaultUri
+                    keyVaultUri: (!empty(customerManagedKeyManagedDisk) && customerManagedKeyManagedDisk!.?keyVaultName != customerManagedKey!.?keyVaultName)
+                      ? cMKManagedDiskKeyVault.properties.vaultUri
+                      : cMKKeyVault.properties.vaultUri
                     keyName: customerManagedKeyManagedDisk!.keyName
-                    keyVersion: !empty(customerManagedKeyManagedDisk.?keyVersion ?? '')
-                      ? customerManagedKeyManagedDisk!.?keyVersion!
-                      : last(split(cMKManagedDiskKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                    keyVersion: last(split(
+                      (!empty(customerManagedKeyManagedDisk) && customerManagedKeyManagedDisk!.?keyVaultName != customerManagedKey!.?keyVaultName)
+                        ? cMKManagedDiskKeyVault::cMKKey.properties.keyUriWithVersion
+                        : cMKKeyVault::cMKKey.properties.keyUriWithVersion,
+                      '/'
+                    ))
                   }
                   rotationToLatestKeyVersionEnabled: (customerManagedKeyManagedDisk.?autoRotationEnabled ?? true == true) ?? false
                 }
