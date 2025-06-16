@@ -16,7 +16,7 @@ param integrationRuntimes integrationRuntimesType[] = []
 @description('Optional. An array of objects for the configuration of Linked Services.')
 param linkedServices linkedServicesType[] = []
 
-@description('Optional. Location for all Resources.')
+@description('Optional. Location for all Azure Resources.')
 param location string = resourceGroup().location
 
 @description('Optional. Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set.')
