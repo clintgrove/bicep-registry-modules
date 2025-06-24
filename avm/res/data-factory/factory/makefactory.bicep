@@ -1,6 +1,6 @@
 module factory 'br/public:avm/res/data-factory/factory:0.10.0' = {
   params: {
-    name: 'bossfactory2'
+    name: 'bossfactory3'
     location: 'ukwest'
     privateEndpoints: [
       {
@@ -16,6 +16,13 @@ module factory 'br/public:avm/res/data-factory/factory:0.10.0' = {
         resourceGroupResourceId: '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/networking'
         service: 'dataFactory'
         subnetResourceId: '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/virtual-machines/providers/Microsoft.Network/virtualNetworks/fordbxvm-vnet/subnets/default'
+      }
+    ]
+    managedPrivateEndpoints: [
+      {
+        groupId: 'AzureBlob'
+        name: 'pe2facfromboss5'
+        privateLinkResourceId: '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/networking/providers/Microsoft.DataFactory/factories/bossfactory2/privateLinkResources/dataFactory'
       }
     ]
     managedVirtualNetworkName: 'default'
