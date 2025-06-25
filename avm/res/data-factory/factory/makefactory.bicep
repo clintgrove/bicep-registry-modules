@@ -20,9 +20,12 @@ module factory 'br/public:avm/res/data-factory/factory:0.10.0' = {
     ]
     managedPrivateEndpoints: [
       {
-        groupId: 'AzureBlob'
+        fqdns: [
+          'fiftysixstg1.blob.core.windows.net'
+        ]
+        groupId: 'blob'
         name: 'pe2facfromboss5'
-        privateLinkResourceId: '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/networking/providers/Microsoft.DataFactory/factories/bossfactory2/privateLinkResources/dataFactory'
+        privateLinkResourceId: '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/storageaccounts/providers/Microsoft.Storage/storageAccounts/fiftysixstg1'
       }
     ]
     managedVirtualNetworkName: 'default'
